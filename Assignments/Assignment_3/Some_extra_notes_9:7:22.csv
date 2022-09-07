@@ -23,7 +23,7 @@ cor(x$Width, x$Area)
       
 cor(x$Length * x$Width, x$Area)
 
-dfdsafdf
+
 
 
 
