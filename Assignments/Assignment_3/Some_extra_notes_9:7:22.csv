@@ -1,0 +1,29 @@
+x <- read.csv("./Data/lw.csv")
+
+x$Length * x$Width  #find the area of each one
+
+x$Area <-  x$Length * x$Width  #how to make a new column in the data set
+                                # the $ is how to access the vector itself
+
+x$LastName <- "Smith"  # how to give a new column of LastName
+
+x$FullName <- paste0(x$Name, " ", x$LastName)  # how to paste Name and LastName together into a new column
+
+x$FullName2 <- paste0(x$LastName, ", ", x$Name)
+
+# Why add new columns in R rather than Excel?  So that we don't touch the original (raw) data
+# So we don't have to modify the actual original data
+
+plot(x$Length, x$Area)
+plot(x$Width, x$Area)
+
+cor(x$Length, x$Area)  # to see if there is any correlation # and it gives you the slope
+
+cor(x$Width, x$Area)
+      
+cor(x$Length * x$Width, x$Area)
+
+dfdsafdf
+
+
+
