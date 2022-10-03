@@ -61,6 +61,6 @@ dat4 %>%
 
 dat4 + transition_time(Time) 
 
-
+dat4
 
 
