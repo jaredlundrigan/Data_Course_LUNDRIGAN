@@ -48,7 +48,7 @@ iris %>%
   theme_bw() +
   theme(strip.text = element_text(face='italic'),
         legend.position = "none") 
-
+class(iris$Species)
 
 data("iris")
 
