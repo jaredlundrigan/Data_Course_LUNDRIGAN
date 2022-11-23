@@ -1,0 +1,137 @@
+---
+title: "LUNDRIGAN_Skills_Test_3_"
+author: "Jared Lundrigan"
+date: "2022-11-23"
+output: html_document
+---
+
+# Analysis of a 1995 Faculty Salaries Data Set
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Loading packages
+
+```{r, results= FALSE , message = FALSE}
+library(tidyverse)
+library(janitor)
+library(modelr)
+library(broom)
+```
+
+### Loading the dataset and cleaning it
+
+```{r message=FALSE, warning=FALSE, results=FALSE}
+
+list.files()
+df <- read_csv("FacultySalaries_1995.csv")
+df <- clean_names(df)
+
+df1 <- pivot_longer(df, cols = c("num_full_profs","num_assoc_profs", "num_assist_profs"),
+             names_to = "profs",
+             values_to = "total_profs")
+  
+df2 <- pivot_longer(df1, cols = c("avg_full_prof_salary", "avg_assoc_prof_salary", "avg_assist_prof_salary"),
+               names_to = "prof_type_salary",
+               values_to = "salary_by_type")
+
+# changing the names of the values
+df2["prof_type_salary"][df2["prof_type_salary"] == "avg_full_prof_salary"] <- "Full"
+df2["prof_type_salary"][df2["prof_type_salary"] == "avg_assist_prof_salary"] <- "Assist"
+df2["prof_type_salary"][df2["prof_type_salary"] == "avg_assoc_prof_salary"] <- "Assoc"
+
+```
+
+### Graphing the salary by rank and college tier
+
+```{r message=F, warning=F}
+df2 %>% 
+  filter(tier != "VIIB") %>%   # filtered tier VIIB since we're only looking at I, IIA, IIB
+  ggplot(aes(x=prof_type_salary,
+             y=salary_by_type,
+             fill = prof_type_salary)) +
+  geom_boxplot() +
+  facet_wrap(~tier) +
+  theme_minimal() +
+  labs(x = "Rank", y = "Salary", ) +
+  theme(axis.text.x = element_text(angle = 45)) +
+  scale_fill_discrete(name = "Rank")
+```
+
+### An ANOVA model that tests the influence of "State", "Tier", and "Rank" on "Salary
+
+```{r, attr.output='style="max-height: 200px;"'}
+
+df3 <- df2
+
+colnames(df3)[14] = "rank"
+
+colnames(df3)[15] = "salary"
+
+# I had to change from character to factor for the model to work
+df3$state <- as.factor(df3$state)
+df3$tier <- as.factor(df3$tier)
+df3$rank <- as.factor(df3$rank)
+
+mod1 <- glm(data = df3, formula = salary ~ state + tier + rank)
+
+summary(mod1)
+
+```
+
+<br>
+<br>
+
+# Analysis of a Juniper Oils Data Set
+### Data collected from a collaboration between Young Living, Inc. and UVU Microbiology. It involves data on dead cedar trees and their essential oil content.
+
+### Cleaning the juniper dataset
+```{r, results=F, message=F}
+list.files()
+juniper <- read_csv("Juniper_Oils.csv")
+juniper1 <- clean_names(juniper)
+
+colnames(juniper1)
+
+# creating a new column to calculate years since burn
+years_since_burn <- 2022 - juniper1$burn_year
+juniper2 <- pivot_longer(juniper1, cols = c(11:33), names_to = "chemical_compounds", 
+                         values_to = "concentration")
+
+```
+
+### Graphing the juniper data
+```{r, message=F, warning=F}
+
+juniper2 %>% 
+  ggplot(aes(x = years_since_burn,
+             y = concentration)) +
+  geom_smooth() +
+  facet_wrap(~chemical_compounds, scales = "free") +
+  theme_minimal() +
+  labs(x = "YearsSinceBurn", y = "Concentration")
+
+```
+
+
+### Generalized linear model to find which chemicals show statistically significant concentrations affected by years since burn
+
+
+```{r, attr.output='style="max-height: 200px;"'}
+
+jmod <- glm(data = juniper2, formula = years_since_burn ~ concentration * chemical_compounds)
+
+jmod_tibble <- tidy(jmod) %>% 
+  filter(p.value < 0.5)
+
+jmod_tibble
+```
+
+<br>
+<br>
+
+
+
+
+
