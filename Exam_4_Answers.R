@@ -1,11 +1,12 @@
 library(tidyverse)
 library(dplyr)
+library(janitor)
 
 # **I.**
   # **Read the cleaned_covid_data.csv file into an R data frame. (20 pts)**
 
 df <- read_csv("cleaned_covid_data.csv")
-view(df)
+df %>% glimpse
 
 # **II.**
 #   **Subset the data set to just show states that begin with "A" and save this as an object called A_states. (20 pts)**
